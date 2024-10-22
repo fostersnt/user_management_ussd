@@ -4,7 +4,7 @@ header('Content-type: text/plain');
 
 // Database connection
 $servername = "localhost"; // Your DB server address
-$username = "root";        // Your DB username
+$username = "foster";        // Your DB username
 $password = "";            // Your DB password
 $dbname = "ussd_app";      // Your DB name
 
