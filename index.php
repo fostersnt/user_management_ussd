@@ -64,7 +64,8 @@ try {
     //     $message = 'Request Rejected';
     // }
 } catch (\Throwable $th) {
-    $message = "ERROR MESSAGE: " . $th->getMessage() . "\nLINE NUMBER: " . $th->getLine();
+    $message = "Unable to process request";
+    // $message = "ERROR MESSAGE: " . $th->getMessage() . "\nLINE NUMBER: " . $th->getLine();
 }
 
 echo $message;
