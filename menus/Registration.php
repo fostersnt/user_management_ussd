@@ -6,6 +6,6 @@ class Registration {
     {
         $welcomeMessage = Welcome::getWelcomeMessage();
 
-        return "$welcomeMessage\n1. Account registration\n2. Car registration\nApartment registration";
+        return "$welcomeMessage\n\n1. Account registration\n2. Car registration\n3. Apartment registration";
     }
 }
