@@ -14,16 +14,8 @@ class dbConnection
         $dotenv = Dotenv::createImmutable(__DIR__, '../.env');
         $dotenv->safeLoad();
 
-        try {
-            $connection = mysqli_connect($db_host, $db_username, $db_password, $db_name);
-            if (! $connection->connect_error) {
-                $result = 'true';
-            }
-        } 
-        catch (\Throwable $th) {
-            $result = 'false';
-        }
+        $connection = mysqli_connect($db_host, $db_username, $db_password, $db_name);
 
-        return $result;
+        return $connection;
     }
 }
