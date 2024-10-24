@@ -32,4 +32,11 @@ class Registration
         return $output;
     }
 
+    public static function sub_Menu_One($search)
+    {
+        $sub_menus = [
+            'ACCOUNT_REGISTRATION'  => "1. Personal account\n2. Family account",
+        ];
+    }
+
 }

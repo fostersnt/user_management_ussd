@@ -6,6 +6,7 @@ require_once('./menus/Registration.php');
 
 require_once('./database/dbConnection.php');
 require_once('./utilities/DbInteractions.php');
+require_once('./menus/AccountRegistration.php');
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->safeLoad();
@@ -14,7 +15,7 @@ $message = '';
 
 try {
     if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
-        
+
         $sessionId = $_POST['sessionId'] ?? '';
         $serviceCode = $_POST['serviceCode'] ?? '';
         $msisdn = $_POST['msisdn'] ?? '';
@@ -36,6 +37,7 @@ try {
         //state management variables
         $step = $userSessionData['step'] ?? 0;
         $current_menu = strtolower($userSessionData['current_menu'] ?? '');
+        $input_description = strtolower($userSessionData['input_description'] ?? '');
         // echo "STEP: $step\nSUB-MENU: $current_menu";
 
         if ($step == 0) {
@@ -48,7 +50,7 @@ try {
                     2 => 'car_registration',
                     3 => 'apartment_registration',
                 ];
-        
+
                 $sessionData = [
                     'session_id' => $sessionId,
                     'msisdn' => $msisdn,
@@ -56,22 +58,20 @@ try {
                     'current_menu' => $submenuOptions[$text],
                     'input_description' => NULL
                 ];
-        
+
                 $outcome = DbInteractions::createUserSession($con, $sessionData);
-        
+
                 if ($outcome['status'] && $outcome['data'] != null) {
                     $message = Registration::Page_2($text);
                 } else {
                     $message = "Unable to store session data. Please try again\n" . Registration::Page_2($text);
                 }
             }
-        } elseif ($step == 1 && $current_menu == 'account_registration') {
-            echo "THE CURRENT MENU IS: $current_menu";
-        }
-        elseif ($step == 2 && $current_menu == 'car_registration') {
-            echo "YOU ARE IN STEP 1";
-        }
-        elseif ($step == 2 && $current_menu == 'car_registration') {
+        } elseif ($step == 1) {
+            $message = AccountRegistration::registerAccount($con, $text, $userSessionData);
+        } elseif ($step == 2 && $current_menu == 'car_registration') {
+            echo json_encode($userSessionData);
+        } elseif ($step == 2 && $current_menu == 'car_registration') {
             echo "YOU ARE IN STEP 1";
         }
     } else {

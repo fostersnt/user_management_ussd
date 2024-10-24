@@ -73,4 +73,15 @@ class DbInteractions
         return $result;
     }
 
+    public static function delete_User_Session($con, $sessionId, $msisdn)
+    {
+        $stmt = $con->prepare("DELETE FROM user_sessions WHERE msisdn = ? AND session_id = ?");
+        $stmt->bind_param('ss', $msisdn, $sessionId);
+        $stmt->execute();
+
+        $data = $stmt->affected_rows;
+
+        return ($data != null) ? ['status' => true, 'data' => $data] : ['status' => false, 'data' => null];
+    }
+
 }
