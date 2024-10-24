@@ -14,6 +14,7 @@ $message = '';
 
 try {
     if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
+        
         $sessionId = $_POST['sessionId'] ?? '';
         $serviceCode = $_POST['serviceCode'] ?? '';
         $msisdn = $_POST['msisdn'] ?? '';
@@ -32,11 +33,9 @@ try {
 
         $userSessionData = $result['data'];
 
-        $row = $userSessionData != null ? $userSessionData->fetch_assoc() : null;
-
         //state management variables
-        $step = $row['step'] ?? 0;
-        $current_menu = strtolower($row['current_menu'] ?? '');
+        $step = $userSessionData['step'] ?? 0;
+        $current_menu = strtolower($userSessionData['current_menu'] ?? '');
         // echo "STEP: $step\nSUB-MENU: $current_menu";
 
         if ($step == 0) {

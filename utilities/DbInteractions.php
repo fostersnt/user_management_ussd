@@ -10,8 +10,6 @@ class DbInteractions
         $msisdn = $userData['msisdn'] ?? null;
         $region = $userData['region'] ?? null;
 
-
-
         $stmt->bind_param('sss', $name, $msisdn, $region);
 
         $stmt->execute();
@@ -34,6 +32,20 @@ class DbInteractions
         return ($stmt != null) ? ['status' => true, 'data' => $result] : ['status' => false, 'data' => null];
     }
 
+    public static function search_User_Session($con, $sessionId, $msisdn)
+    {
+        // echo "\nCURRENT INFO\nmsisdn: $msisdn\nSessionId: $sessionId\n\n";
+
+        $stmt = $con->prepare("SELECT * FROM user_sessions WHERE msisdn = ? AND session_id = ? ORDER BY created_at DESC LIMIT 1");
+        $stmt->bind_param('ss', $msisdn, $sessionId);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        $data = $result ? $result->fetch_assoc() : null;
+
+        return ($data != null) ? ['status' => true, 'data' => $data] : ['status' => false, 'data' => null];
+    }
+
     public static function createUserSession($con, array $sessionData)
     {
         $session_id = $sessionData['session_id'] ?? null;
@@ -43,7 +55,9 @@ class DbInteractions
         $input_description = $sessionData['input_description'] ?? null;
 
         $result = self::search_User_Session($con, $session_id, $msisdn);
-        
+
+        // echo json_encode($result);
+
         if (! $result['status']) {
             $stmt = $con->prepare("INSERT INTO user_sessions (session_id, msisdn, step, current_menu, input_description) VALUES (?, ?, ?, ?, ?)");
 
@@ -59,16 +73,4 @@ class DbInteractions
         return $result;
     }
 
-    public static function search_User_Session($con, $sessionId, $msisdn)
-    {
-        // echo "\nCURRENT INFO\nmsisdn: $msisdn\nSessionId: $sessionId\n\n";
-
-        $stmt = $con->prepare("SELECT * FROM user_sessions WHERE msisdn = ? AND session_id = ? ORDER BY created_at DESC LIMIT 1");
-        $stmt->bind_param('ss', $msisdn, $sessionId);
-        $stmt->execute();
-
-        $result = $stmt->get_result();
-        // echo $result->fetch_assoc();
-        return ($stmt != null && $result->fetch_assoc() != null) ? ['status' => true, 'data' => $result] : ['status' => false, 'data' => null];
-    }
 }
