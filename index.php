@@ -26,28 +26,31 @@ try {
         $db_password = $_ENV['DB_PASSWORD'];
 
         $con = dbConnection::myConnection($db_host, $db_username, $db_password, $db_name);
-        // $result = $con->query("SELECT * FROM user_sessions WHERE session_id = '$sessionId' AND msisdn = '$msisdn' ORDER BY created_at DESC LIMIT 1");
-        $result = $con->query("SELECT * FROM users WHERE msisdn = $msisdn ORDER BY created_at DESC LIMIT 1");
-        echo json_encode($result->fetch_assoc());
-        return null;
-        if ($result->fetch_assoc()) {
-            //state management variables
-            $step = $_SESSION["$sessionId"."_session_data"]['step'];
-            $sub_menu = $_SESSION["$sessionId"."_session_data"]['sub_menu'];
-        } else {
-            //state management variables
-            $step = 0;
-            $sub_menu = '';
-        }
+
+        $stmt = $con->prepare("SELECT * FROM user_sessions WHERE msisdn = ? AND session_id = ? ORDER BY id DESC LIMIT 1");
+        $new_msisdn = $msisdn . '3';
+        $stmt->bind_param('ss', $msisdn, $sessionId);
+        $stmt->execute();
+
+        $processedObj = $stmt->get_result();
+        $row = $processedObj->fetch_assoc();
+        echo json_encode($row);
+       
+        //state management variables
+        $step = $row['step'] ?? 0;
+        $sub_menu = $row['sub_menu'] ?? '';
+
+        $message = $row != null ? "User session is available" : "No user session available";
 
         //Connecting to database
 
-        $stmt = $con->prepare("INSERT INTO users (name, msisdn, region) VALUES (?, ?, ?)");
+        // $stmt = $con->prepare("INSERT INTO users (name, msisdn, region) VALUES (?, ?, ?)");
 
-        $stmt->bind_param('sss', $name, $msisdn, $region);
-        $stmt->execute();
+        // $stmt->bind_param('sss', $name, $msisdn, $region);
 
-        $message = $stmt->affected_rows;
+        // $stmt->execute();
+
+        // $message = $stmt->affected_rows;
 
         // if ($step == 0) {
         //     if ($text == '') {
