@@ -27,30 +27,21 @@ try {
 
         $con = dbConnection::myConnection($db_host, $db_username, $db_password, $db_name);
 
-        $stmt = $con->prepare("SELECT * FROM user_sessions WHERE msisdn = ? AND session_id = ? ORDER BY id DESC LIMIT 1");
+        $stmt = $con->prepare("SELECT * FROM user_sessions WHERE msisdn = ? AND session_id = ? ORDER BY created_at DESC LIMIT 1");
         $new_msisdn = $msisdn . '3';
         $stmt->bind_param('ss', $msisdn, $sessionId);
         $stmt->execute();
 
-        $processedObj = $stmt->get_result();
-        $row = $processedObj->fetch_assoc();
+        // $processedObj = $stmt->get_result();
+        // $row = $processedObj->fetch_assoc();
+        $row = $stmt->get_result()->fetch_assoc();
         echo json_encode($row);
        
         //state management variables
         $step = $row['step'] ?? 0;
         $sub_menu = $row['sub_menu'] ?? '';
 
-        $message = $row != null ? "User session is available" : "No user session available";
-
-        //Connecting to database
-
-        // $stmt = $con->prepare("INSERT INTO users (name, msisdn, region) VALUES (?, ?, ?)");
-
-        // $stmt->bind_param('sss', $name, $msisdn, $region);
-
-        // $stmt->execute();
-
-        // $message = $stmt->affected_rows;
+        // $message = $row != null ? "User session is available" : "No user session available";
 
         // if ($step == 0) {
         //     if ($text == '') {
