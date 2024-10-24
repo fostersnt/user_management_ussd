@@ -5,6 +5,7 @@ require_once('./vendor/autoload.php');
 require_once('./menus/Registration.php');
 
 require_once('./database/dbConnection.php');
+require_once('./utilities/DbInteractions.php');
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->safeLoad();
@@ -27,15 +28,11 @@ try {
 
         $con = dbConnection::myConnection($db_host, $db_username, $db_password, $db_name);
 
-        $stmt = $con->prepare("SELECT * FROM user_sessions WHERE msisdn = ? AND session_id = ? ORDER BY created_at DESC LIMIT 1");
-        $new_msisdn = $msisdn . '3';
-        $stmt->bind_param('ss', $msisdn, $sessionId);
-        $stmt->execute();
+        $result = DbInteractions::search_User_Session($con, $sessionId, $msisdn);
+        $userSessionData = $result['data'];
 
-        // $processedObj = $stmt->get_result();
-        // $row = $processedObj->fetch_assoc();
-        $row = $stmt->get_result()->fetch_assoc();
-        echo json_encode($row);
+        $row = $userSessionData->fetch_assoc();
+        // echo json_encode($row);
        
         //state management variables
         $step = $row['step'] ?? 0;
@@ -43,26 +40,38 @@ try {
 
         // $message = $row != null ? "User session is available" : "No user session available";
 
-        // if ($step == 0) {
-        //     if ($text == '') {
-        //         $message = Registration::Page_1();
-        //     } elseif ($text == 1) {
-        //         $step = 1;
-        //         $sub_menu = 'account_registration';
-        //         $message = Registration::Page_2($text);
-        //     } elseif ($text == 2) {
-        //         $step = 1;
-        //         $sub_menu = 'car_registration';
-        //         $message = Registration::Page_2($text);
-        //     } elseif ($text == 3) {
-        //         $step = 1;
-        //         $sub_menu = 'apartment_registration';
-        //         $message = Registration::Page_2($text);
-        //     }
-        //     $_SESSION['session_data']['step'] = $step;
-        // } elseif ($step == 1 && $text == 1) {
-        //     # code...
-        // }
+        if ($step == 0) {
+            if ($text == '') {
+                $message = Registration::Page_1();
+            } elseif ($text == 1) {
+                // $step = 1;
+                // $sub_menu = 'account_registration';
+                $sessionData = [
+                    'session_id' => $sessionId,
+                    'msisdn' => $msisdn,
+                    'step' => 1,
+                    'submenu' => 'account_registration',
+                ];
+                $outcome = DbInteractions::createUserSession($con, $sessionData);
+                if ($outcome['status'] && $outcome['insert_id'] != null) {
+                    $message = Registration::Page_2($text);
+                } else {
+                    $message = "Unable to store session data. Please try again\n" . Registration::Page_2($text);
+                }
+                
+            } elseif ($text == 2) {
+                $step = 1;
+                $sub_menu = 'car_registration';
+                $message = Registration::Page_2($text);
+            } elseif ($text == 3) {
+                $step = 1;
+                $sub_menu = 'apartment_registration';
+                $message = Registration::Page_2($text);
+            }
+            $_SESSION['session_data']['step'] = $step;
+        } elseif ($step == 1 && $text == 1) {
+            # code...
+        }
     } else {
         $message = 'Request Rejected';
     }
