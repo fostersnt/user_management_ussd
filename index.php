@@ -28,49 +28,49 @@ try {
 
         $con = dbConnection::myConnection($db_host, $db_username, $db_password, $db_name);
 
-        $result = DbInteractions::search_User_Session($con, $sessionId, $msisdn);
+        $result = DbInteractions::search_User_Session_One($con, $sessionId, $msisdn);
         $userSessionData = $result['data'];
 
         $row = $userSessionData->fetch_assoc();
-        // echo json_encode($row);
-       
+
         //state management variables
         $step = $row['step'] ?? 0;
-        $sub_menu = $row['sub_menu'] ?? '';
-
-        // $message = $row != null ? "User session is available" : "No user session available";
+        // $sub_menu = $row['submenu'] ?? '';
+        // echo "STEP: $step\nSUB-MENU: $sub_menu";
 
         if ($step == 0) {
             if ($text == '') {
                 $message = Registration::Page_1();
-            } elseif ($text == 1) {
-                // $step = 1;
-                // $sub_menu = 'account_registration';
+            } elseif (in_array($text, [1, 2, 3])) {
+                $submenuOptions = [
+                    1 => 'account_registration',
+                    2 => 'car_registration',
+                    3 => 'apartment_registration',
+                ];
+        
                 $sessionData = [
                     'session_id' => $sessionId,
                     'msisdn' => $msisdn,
                     'step' => 1,
-                    'submenu' => 'account_registration',
+                    'submenu' => $submenuOptions[$text],
                 ];
+        
                 $outcome = DbInteractions::createUserSession($con, $sessionData);
-                if ($outcome['status'] && $outcome['insert_id'] != null) {
+        
+                if ($outcome['status'] && $outcome['affected_rows'] != null) {
                     $message = Registration::Page_2($text);
                 } else {
                     $message = "Unable to store session data. Please try again\n" . Registration::Page_2($text);
                 }
-                
-            } elseif ($text == 2) {
-                $step = 1;
-                $sub_menu = 'car_registration';
-                $message = Registration::Page_2($text);
-            } elseif ($text == 3) {
-                $step = 1;
-                $sub_menu = 'apartment_registration';
-                $message = Registration::Page_2($text);
             }
-            $_SESSION['session_data']['step'] = $step;
-        } elseif ($step == 1 && $text == 1) {
-            # code...
+        } elseif ($step == 3 && $sub_menu == 'account_registration') {
+            echo "YOU ARE IN STEP 1";
+        }
+        elseif ($step == 2 && $sub_menu == 'car_registration') {
+            echo "YOU ARE IN STEP 1";
+        }
+        elseif ($step == 2 && $sub_menu == 'car_registration') {
+            echo "YOU ARE IN STEP 1";
         }
     } else {
         $message = 'Request Rejected';
