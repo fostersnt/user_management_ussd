@@ -30,7 +30,7 @@ class dbConnection
 
         $sql = "
         CREATE TABLE IF NOT EXISTS users (
-            id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(100) NOT NULL,
             msisdn VARCHAR(20) NOT NULL,
             region VARCHAR(30) NOT NULL,
@@ -67,7 +67,8 @@ class dbConnection
             session_id VARCHAR(255) PRIMARY KEY,
             msisdn VARCHAR(20),
             step INT DEFAULT 0,
-            submenu VARCHAR(50),
+            current_menu VARCHAR(50),
+            input_description VARCHAR(50) DEFAULT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )";
         if ($connection->query($sql) !== TRUE) {

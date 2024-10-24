@@ -28,20 +28,22 @@ try {
 
         $con = dbConnection::myConnection($db_host, $db_username, $db_password, $db_name);
 
-        $result = DbInteractions::search_User_Session_One($con, $sessionId, $msisdn);
+        $result = DbInteractions::search_User_Session($con, $sessionId, $msisdn);
+
         $userSessionData = $result['data'];
 
-        $row = $userSessionData->fetch_assoc();
+        $row = $userSessionData != null ? $userSessionData->fetch_assoc() : null;
 
         //state management variables
         $step = $row['step'] ?? 0;
-        // $sub_menu = $row['submenu'] ?? '';
-        // echo "STEP: $step\nSUB-MENU: $sub_menu";
+        $current_menu = strtolower($row['current_menu'] ?? '');
+        // echo "STEP: $step\nSUB-MENU: $current_menu";
 
         if ($step == 0) {
             if ($text == '') {
                 $message = Registration::Page_1();
             } elseif (in_array($text, [1, 2, 3])) {
+
                 $submenuOptions = [
                     1 => 'account_registration',
                     2 => 'car_registration',
@@ -52,24 +54,25 @@ try {
                     'session_id' => $sessionId,
                     'msisdn' => $msisdn,
                     'step' => 1,
-                    'submenu' => $submenuOptions[$text],
+                    'current_menu' => $submenuOptions[$text],
+                    'input_description' => NULL
                 ];
         
                 $outcome = DbInteractions::createUserSession($con, $sessionData);
         
-                if ($outcome['status'] && $outcome['affected_rows'] != null) {
+                if ($outcome['status'] && $outcome['data'] != null) {
                     $message = Registration::Page_2($text);
                 } else {
                     $message = "Unable to store session data. Please try again\n" . Registration::Page_2($text);
                 }
             }
-        } elseif ($step == 3 && $sub_menu == 'account_registration') {
+        } elseif ($step == 1 && $current_menu == 'account_registration') {
+            echo "THE CURRENT MENU IS: $current_menu";
+        }
+        elseif ($step == 2 && $current_menu == 'car_registration') {
             echo "YOU ARE IN STEP 1";
         }
-        elseif ($step == 2 && $sub_menu == 'car_registration') {
-            echo "YOU ARE IN STEP 1";
-        }
-        elseif ($step == 2 && $sub_menu == 'car_registration') {
+        elseif ($step == 2 && $current_menu == 'car_registration') {
             echo "YOU ARE IN STEP 1";
         }
     } else {
