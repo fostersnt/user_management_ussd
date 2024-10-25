@@ -40,8 +40,10 @@ class General
 
         $full_name = "[MSISDN]: $msisdn, [SESSION_ID]: $sessionId, $message";
         
-        $logger = new Katzgrau\KLogger\Logger(__DIR__ . '/logs', Psr\Log\LogLevel::INFO, array(
-            'extension' => 'log',
+        $logPath = dirname(__DIR__) . '/logs';
+
+        $logger = new Katzgrau\KLogger\Logger( $logPath, Psr\Log\LogLevel::INFO, array(
+            'extension' => 'txt',
             'dateFormat' => 'Y-m-d G:i:s'
         ));
 

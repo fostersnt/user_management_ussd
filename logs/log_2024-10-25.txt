@@ -1,0 +1,2 @@
+[2024-10-25 11:43:35] [info] [MSISDN]: 233553255225, [SESSION_ID]: abcd1234, Hello world
+[2024-10-25 11:43:46] [info] [MSISDN]: 233553255225, [SESSION_ID]: abcd1234, Hello world
