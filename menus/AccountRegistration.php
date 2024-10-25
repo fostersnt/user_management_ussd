@@ -58,17 +58,17 @@ class AccountRegistration
                     'msisdn' => $msisdn,
                     'step' => 1,
                     'current_menu' => $current_menu,
-                    'input_description' => 'age'
+                    'input_description' => 'region'
                 ];
 
                 DbInteractions::delete_User_Session($con, $sessionId, $msisdn);
 
                 $outcome = DbInteractions::createUserSession($con, $sessionData);
 
-                $response = 'Enter your age';
+                $response = 'Enter your region';
             }
-            elseif ($input_description == 'age') {
-                $_SESSION['age'] = $text;
+            elseif ($input_description == 'region') {
+                $_SESSION['region'] = $text;
 
                 $sessionData = [
                     'session_id' => $sessionId,
@@ -77,6 +77,14 @@ class AccountRegistration
                     'current_menu' => $current_menu,
                     'input_description' => 'completed'
                 ];
+
+                $data = [
+                    'msisdn' => $_SESSION['msisdn'],
+                    'name' => $_SESSION['name'],
+                    'region' => $_SESSION['region'],
+                ];
+                
+                DbInteractions::createUser($con, $data);
 
                 DbInteractions::delete_User_Session($con, $sessionId, $msisdn);
 
