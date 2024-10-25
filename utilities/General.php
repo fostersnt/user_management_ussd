@@ -32,25 +32,31 @@ class General
         return $response;
     }
 
-    public static function logMessage($errorType, $errorMessage)
+    public static function logMessage($errorType, $message)
     {
+        //The global variables below should be declared in another file and must have been assigned
+        global $msisdn;
+        global $sessionId;
+
+        $full_name = "[MSISDN]: $msisdn, [SESSION_ID]: $sessionId, $message";
+        
         $logger = new Katzgrau\KLogger\Logger(__DIR__ . '/logs', Psr\Log\LogLevel::INFO, array(
             'extension' => 'log',
-            'dateFormat' => 'Y-m-d i:s'
+            'dateFormat' => 'Y-m-d G:i:s'
         ));
 
         switch ($errorType) {
             case 'info':
-                $logger->info($errorMessage);
+                $logger->info($full_name);
                 break;
             case 'error':
-                $logger->error($errorMessage);
+                $logger->error($full_name);
                 break;
             case 'debug':
-                $logger->debug($errorMessage);
+                $logger->debug($full_name);
                 break;
             default:
-                $logger->info($errorMessage);
+                $logger->info($full_name);
                 break;
         }
     }

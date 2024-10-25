@@ -14,9 +14,7 @@ $dotenv->safeLoad();
 
 $message = '';
 
-General::logMessage('info', 'Hello world');
-echo 'GHANA IS GHANA';
-return null;
+
 
 try {
     if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
@@ -27,6 +25,10 @@ try {
         $text = $_POST['text'] ?? '';
         $region = $_POST['region'] ?? '';
         $name = $_POST['name'] ?? '';
+
+        General::logMessage('info', 'Hello world');
+        echo 'GHANA IS GHANA';
+        return null;
 
         $db_host = $_ENV['DB_HOST'];
         $db_name = $_ENV['DB_NAME'];
