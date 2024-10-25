@@ -79,11 +79,11 @@ class AccountRegistration
                 ];
 
                 $data = [
-                    'msisdn' => $_SESSION['msisdn'],
+                    'msisdn' => $msisdn,
                     'name' => $_SESSION['name'],
                     'region' => $_SESSION['region'],
                 ];
-                
+
                 DbInteractions::createUser($con, $data);
 
                 DbInteractions::delete_User_Session($con, $sessionId, $msisdn);
@@ -91,7 +91,9 @@ class AccountRegistration
                 $outcome = DbInteractions::createUserSession($con, $sessionData);
 
                 if ($outcome['status']) {
-                    $response = "\nPlease confirm your details below:\n\nName: " . $_SESSION['name'] . "\nAGE: " . $_SESSION['age'] . "\n\n1. Confirm";
+                    $name = $_SESSION['name'] ?? 'N/A';
+                    $region = $_SESSION['region'] ?? 'N/A';
+                    $response = "\nPlease confirm your details below:\n\nName: " . $name . "\nREGION: " . $region . "\n\n1. Confirm";
                 } else {
                     $response = 'Unable to completed request';
                 }
@@ -101,9 +103,9 @@ class AccountRegistration
                 if ($text == 1) {
                     $response = 'You have successfully completed account registration';
                 } else {
-                    $response = 'Please enter 1 to complete account registration';
+                    $response = 'You entered invalid text';
                 }
-                
+                DbInteractions::delete_User_Session($con, $sessionId, $msisdn);
             }
             else{
                 $response = 'Unknown selection';

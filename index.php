@@ -26,9 +26,7 @@ try {
         $region = $_POST['region'] ?? '';
         $name = $_POST['name'] ?? '';
 
-        General::logMessage('info', 'Hello world');
-        echo 'GHANA IS GHANA';
-        return null;
+        // General::logMessage('info', 'Hello world');
 
         $db_host = $_ENV['DB_HOST'];
         $db_name = $_ENV['DB_NAME'];

@@ -2,32 +2,48 @@
 
 class DbInteractions
 {
+    public static function search_User_By_Msisdn($con, $msisdn)
+    {
+        $stmt = $con->prepare("SELECT * FROM users WHERE msisdn = ? ORDER BY id ASC LIMIT 1");
+        if ($stmt === false) {
+            return ['status' => false, 'error' => 'Statement preparation failed: ' . $con->error];
+        }
+        $stmt->bind_param('s', $msisdn);
+        if (!$stmt->execute()) {
+            return ['status' => false, 'error' => 'Execution failed: ' . $stmt->error];
+        }
+        $result = $stmt->get_result();
+        $data = $result ? $result->fetch_assoc() : null;
+        $stmt->close();
+        return $data ? ['status' => true, 'data' => $data] : ['status' => false, 'data' => null];
+    }
+
+
     public static function createUser($con, array $userData)
     {
-        $stmt = $con->prepare("INSERT INTO users (name, msisdn, region) VALUES (?, ?, ?)");
+        $result = self::search_User_By_Msisdn($con, $userData['msisdn']);
 
         $name = $userData['name'] ?? null;
         $msisdn = $userData['msisdn'] ?? null;
         $region = $userData['region'] ?? null;
 
-        $stmt->bind_param('sss', $name, $msisdn, $region);
+        if ($result['data'] == null) {
+            $stmt = $con->prepare("INSERT INTO users (name, msisdn, region) VALUES (?, ?, ?)");
 
-        $stmt->execute();
+            $stmt->bind_param('sss', $name, $msisdn, $region);
 
-        $result = $stmt->affected_rows;
+            $stmt->execute();
 
-        return ($stmt != null) ? ['status' => true, 'data' => $result] : ['status' => false, 'data' => null];
-    }
+            $result = $stmt->affected_rows;
+        } else {
+            $stmt = $con->prepare("UPDATE users SET name = ?, msisdn = ?, region = ? WHERE msisdn = '$msisdn'");
 
-    public static function search_User_By_Msisdn($con, $msisdn)
-    {
-        $stmt = $con->prepare("SELECT * FROM users WHERE msisdn = ? ORDER BY id ASC LIMIT 1");
+            $stmt->bind_param('sss', $name, $msisdn, $region);
 
-        $stmt->bind_param('s', $msisdn);
+            $stmt->execute();
 
-        $stmt->execute();
-
-        $result = $stmt->get_result();
+            $result = $stmt->affected_rows;
+        }
 
         return ($stmt != null) ? ['status' => true, 'data' => $result] : ['status' => false, 'data' => null];
     }
@@ -64,7 +80,7 @@ class DbInteractions
             $stmt->bind_param('ssiss', $session_id, $msisdn, $step, $current_menu, $input_description);
 
             $stmt->execute();
-        
+
             $affected_rows = $stmt->affected_rows;
 
             $result = ($stmt != null && $affected_rows != null) ? ['status' => true, 'data' => $affected_rows] : ['status' => false, 'data' => null];
@@ -83,5 +99,4 @@ class DbInteractions
 
         return ($data != null) ? ['status' => true, 'data' => $data] : ['status' => false, 'data' => null];
     }
-
 }
