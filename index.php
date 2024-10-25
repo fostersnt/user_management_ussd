@@ -7,11 +7,16 @@ require_once('./menus/Registration.php');
 require_once('./database/dbConnection.php');
 require_once('./utilities/DbInteractions.php');
 require_once('./menus/AccountRegistration.php');
+require_once('./utilities/General.php');
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->safeLoad();
 
 $message = '';
+
+General::logMessage('info', 'Hello world');
+echo 'GHANA IS GHANA';
+return null;
 
 try {
     if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {

@@ -1,5 +1,6 @@
 <?php
-// namespace \utilities\
+require 'vendor/autoload.php';
+
 class General
 {
     public static function sendUssdResponse($sessionId, $message)
@@ -29,5 +30,28 @@ class General
         curl_close($ch);
 
         return $response;
+    }
+
+    public static function logMessage($errorType, $errorMessage)
+    {
+        $logger = new Katzgrau\KLogger\Logger(__DIR__ . '/logs', Psr\Log\LogLevel::INFO, array(
+            'extension' => 'log',
+            'dateFormat' => 'Y-m-d i:s'
+        ));
+
+        switch ($errorType) {
+            case 'info':
+                $logger->info($errorMessage);
+                break;
+            case 'error':
+                $logger->error($errorMessage);
+                break;
+            case 'debug':
+                $logger->debug($errorMessage);
+                break;
+            default:
+                $logger->info($errorMessage);
+                break;
+        }
     }
 }
