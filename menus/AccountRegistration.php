@@ -68,7 +68,6 @@ class AccountRegistration
                 $response = 'Enter your age';
             }
             elseif ($input_description == 'age') {
-                // echo "\n\nYour name is: " . $text;
                 $_SESSION['age'] = $text;
 
                 $sessionData = [
